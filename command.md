@@ -14,3 +14,7 @@ pip install scikit-image
 pip install matplotlib
 pip install imgaug
 pip install mask-rcnn
+
+pip freeze > requirements.txt
+pip install -r requirements.txt
+
