@@ -2,8 +2,89 @@ import os
 import cv2
 import numpy as np
 
-print('jeelo')
+import tensorflow as tf
+from tensorflow.keras import models, layers
+import matplotlib.pyplot as plt
 
+print('hotel')
+IMAGE_SIZE = 256
+BATCH_SIZE = 32
+CHANNELS = 3
+EPOCHS = 50
+dataset = tf.keras.preprocessing.image_dataset_from_directory('images',
+                                                    shuffle = True,
+                                                    image_size = (IMAGE_SIZE,IMAGE_SIZE),
+                                                    batch_size = BATCH_SIZE)
+
+
+class_name = dataset.class_names
+
+# for image_batch,label_batch in dataset.take(1):
+#     for i in range(12):
+#         ax = plt.subplot(3,4,i+1)
+#         print(ax)
+#         plt.imshow(image_batch[0].numpy().astype("uint8"))
+#         plt.title(class_name[label_batch[0]])
+#         print(plt.title(class_name[label_batch[0]]))
+#         plt.axis("off")
+    # print(image_batch[0].shape)
+    # print(label_batch.numpy())
+    
+def get_dataset_partitions_tf(ds,train_split = 0.8,val_split = 0.1,test_split = 0.1,shuffle =True,shuffle_size = 10000):
+    ds_size=len(ds)
+    
+    if shuffle:
+        ds = ds.shuffle(shuffle_size,seed=12)
+        
+    train_size = int(train_split * ds_size)
+    val_size = int(val_split * ds_size)
+    
+    train_ds = ds.take(train_size)
+    val_ds = ds.skip(train_size).take(val_size)
+    test_ds = ds.skip(train_size).skip(val_size)
+    
+    
+    return  train_ds, val_ds, test_ds
+    
+train_ds, val_ds, test_ds = get_dataset_partitions_tf(dataset)
+print(len(train_ds))
+print(len(val_ds))
+print(len(test_ds))
+
+resize_and_rescale = tf.keras.Sequential([
+   layers.Resizing(IMAGE_SIZE,IMAGE_SIZE),
+  layers.RandomRotation(0.2)
+])
+
+data_augmentation = tf.keras.Sequential([
+    layers.RandomFlip("horizontal_and_vertical"),
+   layers.RandomRotation(0.2),
+])
+input_shape = (IMAGE_SIZE,IMAGE_SIZE,CHANNELS)
+n_classes = 3
+model = models.Sequential([
+    layers.InputLayer(input_shape=input_shape),
+    resize_and_rescale,
+    data_augmentation,
+    layers.Conv2D(32,(3,3),activation='relu',input_shape=input_shape),
+    layers.MaxPooling2D((2,2)),
+    layers.Conv2D(64,kernel_size=(3,3),activation='relu',),
+    layers.MaxPooling2D((2,2)),
+    layers.Conv2D(64,kernel_size=(3,3),activation='relu',),
+    layers.MaxPooling2D((2,2)),
+    layers.Conv2D(64,(3,3),activation='relu',),
+    layers.MaxPooling2D((2,2)),
+    layers.Conv2D(64,(3,3),activation='relu',),
+    layers.MaxPooling2D((2,2)),
+    layers.Conv2D(64,(3,3),activation='relu',),
+    layers.MaxPooling2D((2,2)),
+    layers.Flatten(),
+    layers.Dense(64,activation='relu'),
+    layers.Dense(n_classes,activation='softmax',)
+])
+model.summary()
+model.build(input_shape=input_shape)
+print(model)
 # img = cv2.imread("road.jpg")
 
 # cv2.imshow('image',img)
@@ -107,26 +188,26 @@ print('jeelo')
 
 
 # mask 
-net = cv2.dnn.readNetFromTensorflow("dnn/frozen_inference_graph.pb","dnn/mask_rcnn_inception_v2_coco_2018_01_28.pbtxt")
+# net = cv2.dnn.readNetFromTensorflow("dnn/frozen_inference_graph.pb","dnn/mask_rcnn_inception_v2_coco_2018_01_28.pbtxt")
 
-img = cv2.imread('road1.jpg')
-height, width, _ = img.shape
+# img = cv2.imread('road1.jpg')
+# height, width, _ = img.shape
 
 
-# Black image
-# black_image = np.zeros((height,width,1),np.uint8)
+# # Black image
+# # black_image = np.zeros((height,width,1),np.uint8)
 
-blob = cv2.dnn.blobFromImage(img,swapRB=True)
-net.setInput(blob)
-boxes,masks = net.forward(["detection_out_final","detection_masks"])
-detection_count = boxes.shape[2]
-for i in range(detection_count):
+# blob = cv2.dnn.blobFromImage(img,swapRB=True)
+# net.setInput(blob)
+# boxes,masks = net.forward(["detection_out_final","detection_masks"])
+# detection_count = boxes.shape[2]
+# for i in range(detection_count):
 
-    box = boxes[0,0,i]
-    # print(box)
-    class_id = box[1]
-    print(box)
+#     box = boxes[0,0,i]
+#     # print(box)
+#     class_id = box[1]
+#     print(box)
 
-cv2.imshow("Detected Objects with Polygons and Coordinates", img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.imshow("Detected Objects with Polygons and Coordinates", img)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
