@@ -52,21 +52,21 @@ print(len(val_ds))
 print(len(test_ds))
 
 resize_and_rescale = tf.keras.Sequential([
-   layers.Resizing(IMAGE_SIZE,IMAGE_SIZE),
+  layers.Resizing(IMAGE_SIZE,IMAGE_SIZE),
   layers.RandomRotation(0.2)
 ])
 
 data_augmentation = tf.keras.Sequential([
-    layers.RandomFlip("horizontal_and_vertical"),
+   layers.RandomFlip("horizontal_and_vertical"),
    layers.RandomRotation(0.2),
 ])
 input_shape = (IMAGE_SIZE,IMAGE_SIZE,CHANNELS)
-n_classes = 3
+n_classes = 4
 model = models.Sequential([
-    layers.InputLayer(input_shape=input_shape),
+    layers.InputLayer(shape=input_shape),
     resize_and_rescale,
     data_augmentation,
-    layers.Conv2D(32,(3,3),activation='relu',input_shape=input_shape),
+    layers.Conv2D(32,(3,3),activation='relu'),
     layers.MaxPooling2D((2,2)),
     layers.Conv2D(64,kernel_size=(3,3),activation='relu',),
     layers.MaxPooling2D((2,2)),
@@ -83,8 +83,46 @@ model = models.Sequential([
     layers.Dense(n_classes,activation='softmax',)
 ])
 model.summary()
-model.build(input_shape=input_shape)
+# model.build(input_shape=input_shape)
 print(model)
+
+model.compile(
+    optimizer="adam",
+    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = False),
+    metrics = ['accuracy']
+)
+
+history = model.fit(
+    train_ds,
+    epochs =EPOCHS,
+    batch_size = BATCH_SIZE,
+    verbose = 1,
+    validation_data = val_ds
+)
+print(history.history)
+
+
+
+# Visualize training history
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+epochs_range = range(EPOCHS)
+
+plt.figure(figsize=(8, 8))
+plt.subplot(1, 2, 1)
+plt.plot(epochs_range, acc, label='Training Accuracy')
+plt.plot(epochs_range, val_acc, label='Validation Accuracy')
+plt.legend(loc='lower right')
+plt.title('Training and Validation Accuracy')
+
+plt.subplot(1, 2, 2)
+plt.plot(epochs_range, loss, label='Training Loss')
+plt.plot(epochs_range, val_loss, label='Validation Loss')
+plt.legend(loc='upper right')
+plt.title('Training and Validation Loss')
+plt.show()
 # img = cv2.imread("road.jpg")
 
 # cv2.imshow('image',img)
