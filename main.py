@@ -10,7 +10,7 @@ print('hotel')
 IMAGE_SIZE = 256
 BATCH_SIZE = 32
 CHANNELS = 3
-EPOCHS = 50
+EPOCHS = 3
 dataset = tf.keras.preprocessing.image_dataset_from_directory('images',
                                                     shuffle = True,
                                                     image_size = (IMAGE_SIZE,IMAGE_SIZE),
@@ -101,8 +101,46 @@ history = model.fit(
 )
 print(history.history)
 
+plt.figure(figsize=(15,15))
+def predict(model,img):
+    img_array = tf.keras.preprocessing.image.img_to_array(images[i].numpy(),)
+    img_array = tf.expand_dims(img_array,0)
+    
+    predictions = model.predict(img_array)
+    
+    predicted_class = class_name[np.argmax(predictions[0])]
+    confidence = round(100*(np.max(predictions[0])),2)
+    return predicted_class , confidence
+
+for images,labels in test_ds.take(1):
+    for i in range(9):
+        ax = plt.subplot(3,3,i+1)
+        plt.imshow(images[i].numpy().astype("uint8"))
+        
+        predicted_class,confidence = predict(model,images[i].numpy())
+        actual_class = class_name[labels[i]]
+        plt.title(f"Actuakl: {actual_class}, \n Prediction: {predicted_class}.\n Confidence: {confidence}")
+        
+        plt.axis("off")
 
 
+
+model_version = max([int(i) for i in os.listdir("models/") if i.isdigit()] + [0]) + 1
+model_dir = f"models/{model_version}"
+
+# Create the directory if it doesn't exist
+os.makedirs(model_dir, exist_ok=True)
+
+# Save the model in the desired format
+model.save(os.path.join(model_dir, "model.keras"))
+
+# model_version = 1
+# model_dir = f"models/{model_version}"
+# model.save(f"models/{model_version}/model.h5")
+
+
+# model_version = max([int(i) for i in os.listdir("models/")+[0]])+1
+# model.save(f"/models/{model_version}/")
 # Visualize training history
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
