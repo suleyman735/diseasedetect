@@ -18,3 +18,6 @@ pip install mask-rcnn
 pip freeze > requirements.txt
 pip install -r requirements.txt
 
+
+split_folders --output dataset --ratio .7 .1 .2 -- models
+
