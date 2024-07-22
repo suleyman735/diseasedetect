@@ -6,7 +6,7 @@ import tensorflow as tf
 from tensorflow.keras import models, layers
 import matplotlib.pyplot as plt
 
-print('hotel')
+# print('hotel')
 IMAGE_SIZE = 256
 BATCH_SIZE = 32
 CHANNELS = 3
@@ -47,9 +47,9 @@ def get_dataset_partitions_tf(ds,train_split = 0.8,val_split = 0.1,test_split = 
     return  train_ds, val_ds, test_ds
     
 train_ds, val_ds, test_ds = get_dataset_partitions_tf(dataset)
-print(len(train_ds))
-print(len(val_ds))
-print(len(test_ds))
+# print(len(train_ds))
+# print(len(val_ds))
+# print(len(test_ds))
 
 resize_and_rescale = tf.keras.Sequential([
   layers.Resizing(IMAGE_SIZE,IMAGE_SIZE),
@@ -84,7 +84,7 @@ model = models.Sequential([
 ])
 model.summary()
 # model.build(input_shape=input_shape)
-print(model)
+# print(model)
 
 model.compile(
     optimizer="adam",
@@ -99,7 +99,7 @@ history = model.fit(
     verbose = 1,
     validation_data = val_ds
 )
-print(history.history)
+# print(history.history)
 
 plt.figure(figsize=(15,15))
 def predict(model,img):
