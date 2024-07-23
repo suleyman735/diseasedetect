@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 IMAGE_SIZE = 256
 BATCH_SIZE = 32
 CHANNELS = 3
-EPOCHS = 3
+EPOCHS = 50
 dataset = tf.keras.preprocessing.image_dataset_from_directory('images',
                                                     shuffle = True,
                                                     image_size = (IMAGE_SIZE,IMAGE_SIZE),
