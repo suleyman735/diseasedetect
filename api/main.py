@@ -29,14 +29,7 @@ async def ping():
     return "Hello, World"
 
 
-# def read_file_as_image(data) -> np.ndarray:
-#     image = Image.open(BytesIO(data))
-#     image = image.resize((IMAGE_SIZE, IMAGE_SIZE))  # Ensure image is resized to 256x256
-#     image = np.array(image)
-#     if image.shape[-1] == 4:
-#         image = image[..., :3]
-#     image = image / 255.0  # Normalize to [0, 1]
-#     return image
+
 def read_file_as_image(data)-> np.ndarray:
    image= np.array(Image.open(BytesIO(data)))
    
@@ -67,12 +60,7 @@ def image_to_base64(image: np.ndarray) -> str:
     return img_str
 
 
-# # Ensure that dataset_image_paths contains valid paths to images
-# dataset_image_paths = [os.path.join(root, file) for root, _, files in os.walk('../dataset/train') for file in files if file.endswith(('JPG', 'jpeg', 'png'))]
 
-# # Print to verify paths
-# print(f"Found {len(dataset_image_paths)} images in dataset.")
-# dataset_images = preprocess_dataset(dataset_image_paths)
 
 @app.post("/predict")
 async def predict(file: UploadFile=File(...)):
@@ -91,6 +79,15 @@ async def predict(file: UploadFile=File(...)):
             # "similarity_percentage": similarity_percentage,"similar_image": 'similar_image_base64'
             }
 
+if __name__ == "__main__":
+    uvicorn.run(app,host='127.0.0.1', port=8000)
+
+# # Ensure that dataset_image_paths contains valid paths to images
+# dataset_image_paths = [os.path.join(root, file) for root, _, files in os.walk('../dataset/train') for file in files if file.endswith(('JPG', 'jpeg', 'png'))]
+
+# # Print to verify paths
+# print(f"Found {len(dataset_image_paths)} images in dataset.")
+# dataset_images = preprocess_dataset(dataset_image_paths)
 # # Ensure the AugmentedImages directory exists
 # augmented_images_dir = "AugmentedImages"
 
@@ -120,8 +117,7 @@ async def predict(file: UploadFile=File(...)):
 
 
 
-if __name__ == "__main__":
-    uvicorn.run(app,host='127.0.0.1', port=8000)
+
     
     
     

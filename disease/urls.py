@@ -1,9 +1,9 @@
 from django.urls import path
 
-from .views import Disease
+from .views import PredictView
 
 app_name='disease'
 
 urlpatterns = [
-    path('',Disease.as_view(), name='myview'),
+    path('predict/',PredictView.as_view(), name='myview'),
 ]
