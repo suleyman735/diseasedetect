@@ -19,16 +19,7 @@ dataset = tf.keras.preprocessing.image_dataset_from_directory('images',
 
 class_name = dataset.class_names
 
-# for image_batch,label_batch in dataset.take(1):
-#     for i in range(12):
-#         ax = plt.subplot(3,4,i+1)
-#         print(ax)
-#         plt.imshow(image_batch[0].numpy().astype("uint8"))
-#         plt.title(class_name[label_batch[0]])
-#         print(plt.title(class_name[label_batch[0]]))
-#         plt.axis("off")
-    # print(image_batch[0].shape)
-    # print(label_batch.numpy())
+
     
 def get_dataset_partitions_tf(ds,train_split = 0.8,val_split = 0.1,test_split = 0.1,shuffle =True,shuffle_size = 10000):
     ds_size=len(ds)
@@ -47,9 +38,7 @@ def get_dataset_partitions_tf(ds,train_split = 0.8,val_split = 0.1,test_split = 
     return  train_ds, val_ds, test_ds
     
 train_ds, val_ds, test_ds = get_dataset_partitions_tf(dataset)
-# print(len(train_ds))
-# print(len(val_ds))
-# print(len(test_ds))
+
 
 resize_and_rescale = tf.keras.Sequential([
   layers.Resizing(IMAGE_SIZE,IMAGE_SIZE),
@@ -84,7 +73,6 @@ model = models.Sequential([
 ])
 model.summary()
 # model.build(input_shape=input_shape)
-# print(model)
 
 model.compile(
     optimizer="adam",
@@ -134,13 +122,7 @@ os.makedirs(model_dir, exist_ok=True)
 # Save the model in the desired format
 model.save(os.path.join(model_dir, "model.keras"))
 
-# model_version = 1
-# model_dir = f"models/{model_version}"
-# model.save(f"models/{model_version}/model.h5")
 
-
-# model_version = max([int(i) for i in os.listdir("models/")+[0]])+1
-# model.save(f"/models/{model_version}/")
 # Visualize training history
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
@@ -168,6 +150,28 @@ plt.show()
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
 
+
+
+
+# for image_batch,label_batch in dataset.take(1):
+#     for i in range(12):
+#         ax = plt.subplot(3,4,i+1)
+#         print(ax)
+#         plt.imshow(image_batch[0].numpy().astype("uint8"))
+#         plt.title(class_name[label_batch[0]])
+#         print(plt.title(class_name[label_batch[0]]))
+#         plt.axis("off")
+    # print(image_batch[0].shape)
+    # print(label_batch.numpy())
+
+
+# model_version = 1
+# model_dir = f"models/{model_version}"
+# model.save(f"models/{model_version}/model.h5")
+
+
+# model_version = max([int(i) for i in os.listdir("models/")+[0]])+1
+# model.save(f"/models/{model_version}/")
 
 
 

@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 
+from disease.models import ImageUpload
+
 
 IMAGE_SIZE = 256
 CHANNELS = 3
@@ -27,7 +29,9 @@ def read_file_as_image(data) -> np.ndarray:
         image = image[..., :3]
     return image
 
-
+# Define a function to compute a loss-like measure (e.g., Euclidean distance)
+def compute_loss(prediction_vector, reference_vector):
+    return np.sqrt(np.sum(np.square(prediction_vector - reference_vector)))
 
 class PredictView(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -42,11 +46,27 @@ class PredictView(APIView):
         img_batch = np.expand_dims(image, 0)
         predictions = MODEL.predict(img_batch)
         index = np.argmax(predictions[0])
+        
+        # loss
+        prediction_vector = predictions[0]
+        reference_vector = np.zeros_like(prediction_vector) 
+         # Compute a loss or distance
+        loss = compute_loss(prediction_vector, reference_vector)
+        
         predicted_class = CLASS_NAMES[index]
         confidence = np.max(predictions[0])
+        
+                    # Save the image and prediction to the database
+        image_prediction = ImageUpload(
+                image=file_obj,
+                predicted_class=predicted_class,
+                confidenceforpre = float(confidence),
+            )
+        image_prediction.save()
 
         return Response({
             "message": "Prediction received and processed",
             "class": predicted_class,
-            "confidence": float(confidence)
+            "confidence": float(confidence),
+            "loss": float(loss)  
         }, status=status.HTTP_200_OK)
